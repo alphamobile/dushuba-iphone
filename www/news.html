@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>读书吧</title>
+    <link rel="stylesheet" href="css/jquery.mobile-1.1.0.min.css" type="text/css" media="screen" title="no title">
+	<link rel="stylesheet" href="css/main.css" type="text/css" media="screen" title="no title">
+	<script type="text/javascript" charset="utf-8" src="js/cordova-1.6.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/jquery.mobile-1.1.0.min.js"></script>
+<script type="text/javascript">
+var start = 1;
+var max = 10;
+var url = 'http://api.douban.com/people/dushuba/miniblog?start-index=' + start + '&max-results=' + max + '&alt=xd&callback=?'
+$(document).bind('pageinit', function(event, data) {
+    $('#news').empty().append('<div style="text-align:center; padding:0px;"><img src="images/loader.gif" /></div>');
+    $('#more').hide();
+    $.getJSON(url, function(result) {
+        var entries = result.entry;
+
+        var html = '';
+        $('#news').empty();
+        html += '<ul id="newsContainer" data-role="listview" data-inset="true" class="ui-listview" style="margin:1px;border:none;">';
+        $.each(entries, function(i, entry) {
+            var content = entry.content['$t'];
+            var pubdate = entry.published['$t'];
+            html += '<li data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" data-theme="c" class="ui-btn  ui-btn-hover-c ui-btn-up-c">';
+            html += '<div class=" ui-li" style="padding:5px;"><div class=""><a href="#" class="ui-link-inherit">';
+
+            html += '<p class="saying">'+ content +'</p>';
+            html += '<span style="display:block;text-align:right;"><strong class="date">发布于: ' + pubdate.substr(0, 10) + ' ' + pubdate.substr(11, 8) + '</strong></span>';
+            html += '</a></div></div></li>';
+        });
+        html += '</ul>';
+        $('#news').append(html);
+        $('#more').show();
+    });
+});
+
+$(document).ready(function() {
+    $('#more').bind('click', function(event, data) {
+        start = start + max;
+        url = 'http://api.douban.com/people/dushuba/miniblog?start-index=' + start + '&max-results=' + max + '&alt=xd&callback=?'
+        $('#loader').show();
+        $('#more').hide();
+        $.getJSON(url, function(result) {
+            var entries = result.entry;
+
+            var html = '';
+
+            $.each(entries, function(i, entry) {
+                var content = entry.content['$t'];
+                var pubdate = entry.published['$t'];
+                html += '<li data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" data-theme="c" class="ui-btn  ui-btn-hover-c ui-btn-up-c">';
+                html += '<div class=" ui-li" style="padding:5px;"><div class=""><a href="#" class="ui-link-inherit">';
+
+                html += '<p class="saying">'+ content +'</p>';
+                html += '<span style="display:block;text-align:right;"><strong class="date">发布于: ' + pubdate.substr(0, 10) + ' ' + pubdate.substr(11, 8) + '</strong></span>';
+                html += '</a></div></div></li>';
+                html += '</div>';
+            });
+
+            $('#newsContainer').append(html);
+
+            $('#loader').hide();
+            $('#more').show();
+        });
+    });
+});
+</script>
+  </head>
+  <body>
+  <div data-role="page" id="main">
+	<div data-role="header" data-position="fixed">
+		<h1>最新动态</h1>
+	</div>
+	<div data-role="content">
+		<div id="news">
+		</div>
+
+        <span id="moreContainer"><div id="loader" style="text-align:center; padding:0px;display:none;"><img src="images/loader.gif" /></div>
+        <a id="more" data-role="button" data-theme="b">更多</a></span>
+	</div>
+	<div data-role="footer" class="nav-glyphish ui-footer ui-bar-a" data-position="fixed" role="contentinfo">
+		<div data-role="navbar" class="nav-glyphish ui-navbar" data-iconpos="top" role="navigation">
+			<ul>
+				<li><a id="home" href="index.html" data-ajax="false" data-role="button" data-icon="home">文章</a></li>
+				<li><a id="activity" href="activities.html" data-ajax="false" data-role="button" data-icon="star">活动</a></li>
+                <li><a id="favorite" href="favorites.html" data-ajax="false" data-role="button" data-icon="star">推荐</a></li>
+                <li><a id="news" href="news.html" data-ajax="false" data-role="button" data-icon="star" class="ui-btn-active">动态</a></li>
+				<li><a id="about" href="about.html" data-ajax="false" data-role="button" data-icon="gear">关于</a></li>
+			</ul>
+		</div>
+	</div>
+	</div>
+  </body>
+</html>

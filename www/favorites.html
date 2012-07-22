@@ -1,0 +1,209 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>读书吧</title>
+    <link rel="stylesheet" href="css/jquery.mobile-1.1.0.min.css" type="text/css" media="screen" title="no title">
+	<link rel="stylesheet" href="css/main.css" type="text/css" media="screen" title="no title">
+	<script type="text/javascript" charset="utf-8" src="js/cordova-1.6.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/jquery.mobile-1.1.0.min.js"></script>
+<script type="text/javascript">
+var start = 1;
+var max = 10;
+var url = 'http://api.douban.com/people/dushuba/collection?cat=book&start-index=' + start + '&max-results=' + max + '&alt=xd&callback=?'
+
+$(document).bind('pageinit', function(event, data) {
+    $('#favorites').empty().append('<div style="text-align:center; padding:0px;"><img src="images/loader.gif" /></div>');
+    $('#more').hide();
+    $.getJSON("http://api.douban.com/people/dushuba/collection?cat=book&start-index=1&max-results=10&alt=xd&callback=?", function(result) {
+        var entries = result.entry;
+
+        var html = '';
+        $('#favorites').empty();
+        html += '<ul id="favoritesContainer" data-role="listview" data-inset="true" class="ui-listview" style="margin:1px;border:none;">';
+        $.each(entries, function(i, entry) {
+            var link = entry['db:subject'].link[1]['@href'];
+            var imgLink = entry['db:subject'].link[2]['@href'];
+            var title = entry['db:subject'].title['$t'];
+            var author = entry['db:subject'].author[0].name['$t'];
+            var rate = entry['gd:rating']['@value'];
+            var attrs = entry['db:subject']['db:attribute'];
+            html += '<li data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" data-theme="c" class="ui-btn ui-btn-hover-c ui-btn-up-c">';
+            html += '<div class=" ui-li"><div class="ui-btn-text" style="padding-top:10px;"><a href="#" class="ui-link-inherit">';
+            html += '<h3 class="ui-li-heading" style="padding-left:10px;">'+ title +'</h3><br/>';
+            html += '<div class="ui-grid-b">';
+            html += '<div class="ui-block-a"><img src="' + imgLink + '" class="thumbnail" style="max-height:120px;max-width:120px;padding-top:10px;padding-left:10px;"></div>';
+            html += '<div class="ui-block-b"><p class="info">';
+            for (var i=0; i<attrs.length; i++)
+            {
+                if (!attrs[i]) break;
+                var pn = attrs[i]['@name'];
+                var pv = attrs[i]['$t'];
+                html += '<span class="p1">';
+                if (pn=='author')
+                {
+                    html += '作者: </span> ' + pv + '<br/>';
+                }
+                else if (pn=='publisher')
+                {
+                    html += '出版社: </span> ' + pv + '<br/>';
+                }
+                else if (pn=='price')
+                {
+                    html += '定价: </span> ' + pv + '<br/>';
+                }
+                else if (pn=='pubdate')
+                {
+                    html += '出版时间: </span> ' + pv + '<br/>';
+                }
+            }
+            html += '</p></div>';
+            html += '<div class="ui-block-c" style="float:right;">';
+            switch (rate)
+            {
+                case  '5':
+                    html += '<span class="bigstar50"></span>';
+                    break;
+                case  '4':
+                    html += '<span class="bigstar40"></span>';
+                    break;
+                case  '3':
+                    html += '<span class="bigstar30"></span>';
+                    break;
+                case  '2':
+                    html += '<span class="bigstar20"></span>';
+                    break;
+                case  '1':
+                    html += '<span class="bigstar10"></span>';
+                    break;
+                case  '0':
+                    html += '<span class="bigstar00"></span>';
+                    break;
+                default:
+                    html += '<span class="bigstar00"></span>';
+            }
+            html += '</div></div>';
+            html += '</a></div></div></li>';
+        });
+        html += '</ul>';
+        $('#favorites').append(html);
+        $('#more').show();
+    });
+});
+
+$(document).ready(function() {
+    $('#more').bind('click', function(event, data) {
+        start = start + max;
+        url = 'http://api.douban.com/people/dushuba/collection?cat=book&start-index=' + start + '&max-results=' + max + '&alt=xd&callback=?'
+
+        $.getJSON(url, function(result) {
+            var entries = result.entry;
+            var html = '';
+
+            $('#loader').show();
+            $('#more').hide();
+            $.each(entries, function(i, entry) {
+                var link = entry['db:subject'].link[1]['@href'];
+                var imgLink = entry['db:subject'].link[2]['@href'];
+                var title = entry['db:subject'].title['$t'];
+                var author = entry['db:subject'].author[0].name['$t'];
+                var rate = entry['gd:rating']['@value'];
+                var attrs = entry['db:subject']['db:attribute'];
+                html += '<li data-corners="false" data-shadow="false" data-iconshadow="true" data-wrapperels="div" data-icon="arrow-r" data-iconpos="right" data-theme="c" class="ui-btn ui-btn-hover-c ui-btn-up-c">';
+                html += '<div class=" ui-li"><div class="ui-btn-text" style="padding-top:10px;"><a href="#" class="ui-link-inherit">';
+                html += '<h3 class="ui-li-heading" style="padding-left:10px;">'+ title +'</h3><br/>';
+                html += '<div class="ui-grid-b">';
+                html += '<div class="ui-block-a"><img src="' + imgLink + '" class="" style="max-height:120px;max-width:120px;padding-top:10px;padding-left:10px;"></div>';
+                html += '<div class="ui-block-b"><p class="info">';
+                for (var i=0; i<attrs.length; i++)
+                {
+                    if (!attrs[i]) break;
+                    var pn = attrs[i]['@name'];
+                    var pv = attrs[i]['$t'];
+                    html += '<span class="p1">';
+                    if (pn=='author')
+                    {
+                        html += '作者: </span> ' + pv + '<br/>';
+                    }
+                    else if (pn=='publisher')
+                    {
+                        html += '出版社: </span> ' + pv + '<br/>';
+                    }
+                    else if (pn=='price')
+                    {
+                        html += '定价: </span> ' + pv + '<br/>';
+                    }
+                    else if (pn=='pubdate')
+                    {
+                        html += '出版时间: </span> ' + pv + '<br/>';
+                    }
+                }
+                html += '</p></div>';
+                html += '<div class="ui-block-c" style="float:right;">';
+                switch (rate)
+                {
+                    case  '5':
+                        html += '<span class="bigstar50"></span>';
+                        break;
+                    case  '4':
+                        html += '<span class="bigstar40"></span>';
+                        break;
+                    case  '3':
+                        html += '<span class="bigstar30"></span>';
+                        break;
+                    case  '2':
+                        html += '<span class="bigstar20"></span>';
+                        break;
+                    case  '1':
+                        html += '<span class="bigstar10"></span>';
+                        break;
+                    case  '0':
+                        html += '<span class="bigstar00"></span>';
+                        break;
+                    default:
+                        html += '<span class="bigstar00"></span>';
+                }
+                html += '</div></div>';
+                html += '</a></div></div></li>';
+
+            });
+
+            $('#favoritesContainer').append(html);
+
+            $('#loader').hide();
+            $('#more').show();
+        });
+    });
+});
+</script>
+</head>
+  <body>
+  <div data-role="page" id="main">
+	<div data-role="header" data-position="fixed">
+		<h1>热门推荐</h1>
+	</div>
+	<div data-role="content">
+		<div id="favorites">
+		</div>
+
+        <span id="moreContainer"><div id="loader" style="text-align:center; padding:0px;display:none;"><img src="images/loader.gif" /></div>
+        <a id="more" data-role="button" data-theme="b">更多</a></span>
+
+	</div>
+	<div data-role="footer" class="nav-glyphish ui-footer ui-bar-a" data-position="fixed" role="contentinfo">
+		<div data-role="navbar" class="nav-glyphish ui-navbar" data-iconpos="top" role="navigation">
+			<ul>
+				<li><a id="home" href="index.html" data-ajax="false" data-role="button" data-icon="home">文章</a></li>
+				<li><a id="activity" href="activities.html" data-ajax="false" data-role="button" data-icon="star">活动</a></li>
+                <li><a id="favorite" href="favorites.html" data-ajax="false" data-role="button" data-icon="star" class="ui-btn-active">推荐</a></li>
+                <li><a id="news" href="news.html" data-ajax="false" data-role="button" data-icon="star">动态</a></li>
+				<li><a id="about" href="about.html" data-ajax="false" data-role="button" data-icon="gear">关于</a></li>
+			</ul>
+		</div>
+	</div>
+	</div>
+  </body>
+</html>
